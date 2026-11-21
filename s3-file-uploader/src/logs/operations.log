@@ -1,0 +1,13 @@
+[2026-11-21 17:09:12] CREATE_BUCKET: SUCCESS - Created bucket with name: kajhsa
+[2026-11-21 17:09:22] UPLOAD_FILE: FAILED - Upload failed for file missing to asdg
+[2026-11-21 17:09:34] LIST_BUCKET: SUCCESS - Contents listed for abdhan-test-bucket-2026
+[2026-11-21 17:09:55] DELETE_FILE: SUCCESS - Deleted missing from kajhsa
+[2026-11-21 17:10:51] LIST_BUCKET: SUCCESS - Contents listed for kajhsa
+[2026-11-21 17:11:03] DELETE_FILE: SUCCESS - Deleted text' from kajhsa
+[2026-11-21 17:17:48] DELETE_FILE: FAILED - Failed to delete missing from kajhsa
+[2026-11-21 17:23:09] CREATE_BUCKET: FAILED - Could not create bucket with name: starting-with-spaces-**-special-chars
+[2026-11-21 17:23:33] CREATE_BUCKET: SUCCESS - Created bucket with name: starting-with-spaces
+[2026-11-21 17:30:12] UPLOAD_FILE: SUCCESS - Uploaded file test.txt to kajhsa
+[2026-11-21 17:30:18] LIST_BUCKET: SUCCESS - Contents listed for kajhsa
+[2026-11-21 17:44:05] UPLOAD_FILE: SUCCESS - Uploaded file test.txt to kajhsa
+[2026-11-21 17:44:18] LIST_BUCKET: SUCCESS - Contents listed for kajhsa
