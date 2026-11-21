@@ -117,13 +117,20 @@ def log_operation(operation_type, status, details):
     except Exception as e:
         print(f"Warning: Cannot write to log file: {e}")
 
+def validate_bucket_name(bucket_name):
+    """Clean and normalize S3 bucket names."""
+    return bucket_name.strip().lower().replace(" ", "-")
+
 def create_s3_bucket(bucket_name):
+    """Create a new S3 bucket with normalized naming."""
+    clean_name = validate_bucket_name(bucket_name)
+    print(f"Cleaned bucket name: '{clean_name}'")
+
     """Create a new S3 bucket."""
     client = create_s3_client()
     if client is None:
         return False
     try:
-        clean_name = bucket_name.strip().lower().replace(" ", "-")
         config = load_aws_config()
         region = config["region"] if config else AWS_REGION
 
@@ -204,7 +211,7 @@ def delete_file_from_s3(file_name, bucket_name):
     try:
         # Check if object exists first (raises 404 ClientError if missing)
         client.head_object(Bucket=bucket_name, Key=file_name)
-        
+
         client.delete_object(Bucket=bucket_name, Key=file_name)
         print(f"✓ File '{file_name}' deleted from '{bucket_name}'!")
         return True
@@ -230,10 +237,11 @@ while True:
     if choice == "1":
         # Create bucket code here
         bucket_name = input("Enter only a unique bucket name: ")
-        if create_s3_bucket(bucket_name):
-            log_operation("CREATE_BUCKET", "SUCCESS", f"Created bucket with name: {bucket_name}")
+        clean_name = validate_bucket_name(bucket_name)
+        if create_s3_bucket(clean_name):
+            log_operation("CREATE_BUCKET", "SUCCESS", f"Created bucket with name: {clean_name}")
         else:
-            log_operation("CREATE_BUCKET", "FAILED", f"Could not create bucket with name: {bucket_name}")
+            log_operation("CREATE_BUCKET", "FAILED", f"Could not create bucket with name: {clean_name}")
 
     elif choice == "2":
         # Upload file code here
