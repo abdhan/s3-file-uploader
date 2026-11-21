@@ -1,51 +1,43 @@
-# Debugging Log - S3 File Uploader
+## Bug #1: show_operation_stats() crashes with IndexError
 
-**Student Name**: [Your Name]  
-**Date Started**: [Today's Date]
-
-## Purpose
-This document tracks all bugs found during development, the debugging process used to find them, and how they were resolved.
-
----
-
-## Bug #1: [Bug Title]
-
-**Date Found**: [Date]
+**Date Found**: 21 Nov 2026
 
 **How to Reproduce**:
-1. [Step 1]
-2. [Step 2]
-3. [etc]
+1. Perform a few S3 operations to populate log
+2. Choose choice 6 to see statistics
+3. Error is displayed while trying to display statistics
 
 **Expected Behavior**: 
-[What should happen]
+It should give the total no. of operations with a list of each type of operation
 
 **Actual Behavior**: 
-[What actually happens]
+It gave a list of operations but when it came to count the total operations it would desplay the below error.
 
 **Error Message/Output**:
-[Paste error message or unexpected output here]
+❌ Error reading statistics: list index out of range
 
 **Debugging Process**:
-1. [What you tried first]
-2. [Debug statements you added]
-3. [What the debug output showed]
-4. [How you identified the cause]
+1. Added print statements to trace execution
 
 **Root Cause**: 
-[Explanation of what caused the bug]
+Statement was trying to access a non existing index in the list. A list starts at 0 and the statement counted from 0
 
 **Fix Applied**:
-[Code showing the fix]
+print(f"\nMost recent operation: {operations[len(operations) - 1]}")
+
 
 **Testing After Fix**:
-- [Test 1 result]
-- [Test 2 result]
+📊 Operation Statistics:
+Total operations performed: 13
 
-**Commit**: [Commit message]
+Operation breakdown:
+  Creates: 3
+  Uploads: 3
+  Lists: 4
+  Deletes: 3
 
-**GitHub Issue**: [Issue #X]
+**Commit**: "Fix: Correct list index in show_operation_stats - Fixes #1"
+
+**GitHub Issue**: #1
 
 ---
-
-[Add more bug entries as needed]

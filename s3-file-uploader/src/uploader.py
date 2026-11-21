@@ -255,7 +255,9 @@ def show_operation_stats():
         print(f"  Uploads: {operations.count('upload')}")
         print(f"  Lists: {operations.count('list')}")
         print(f"  Deletes: {operations.count('delete')}")
-        print(f"\nMost recent operation: {operations[len(operations)]}")  # BUG HERE!
+
+        # FIX: Use len(operations)-1 to get the last index
+        print(f"\nMost recent operation: {operations[len(operations) - 1]}")  # FIXED
 
     except FileNotFoundError:
         print("❌ No log file found. Use the application to generate logs first.")
@@ -273,7 +275,7 @@ while True:
     print("6. Show operation statistics")  # NEW OPTION
     print("7. Exit")
 
-    choice = input("\nEnter your choice (1-6): ")
+    choice = input("\nEnter your choice (1-7): ")
 
     if choice == "1":
         # Create bucket code here
@@ -316,10 +318,9 @@ while True:
 
     elif choice == "6":
         show_operation_stats()  # NEW
-        
+
     elif choice == "7":
         print("Goodbye!")
         break
     else:
         print("Invalid choice. Please try again.")
-
