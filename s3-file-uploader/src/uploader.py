@@ -222,6 +222,46 @@ def delete_file_from_s3(file_name, bucket_name):
         print(f"✗ Error deleting file: {e}")
         return False
 
+
+# Deliberately buggy function for testing error handling
+def show_operation_stats():
+    """Display statistics about operations performed"""
+    print("\n📊 Operation Statistics:")
+
+    try:
+        # Read the log file to count operations
+        with open('logs/operations.log', 'r') as f:
+            lines = f.readlines()
+
+        if len(lines) == 0:
+            print("No operations logged yet")
+            return
+
+        # Count different operation types
+        operations = []
+        for line in lines:
+            if "CREATE_BUCKET" in line:
+                operations.append("create")
+            elif "UPLOAD_FILE" in line:
+                operations.append("upload")
+            elif "LIST_BUCKET" in line:
+                operations.append("list")
+            elif "DELETE_FILE" in line:
+                operations.append("delete")
+
+        print(f"Total operations performed: {len(operations)}")
+        print("\nOperation breakdown:")
+        print(f"  Creates: {operations.count('create')}")
+        print(f"  Uploads: {operations.count('upload')}")
+        print(f"  Lists: {operations.count('list')}")
+        print(f"  Deletes: {operations.count('delete')}")
+        print(f"\nMost recent operation: {operations[len(operations)]}")  # BUG HERE!
+
+    except FileNotFoundError:
+        print("❌ No log file found. Use the application to generate logs first.")
+    except Exception as e:
+        print(f"❌ Error reading statistics: {e}")
+
 # Main program - Menu interface starts here
 while True:
     print("\n=== S3 File Uploader ===")
@@ -230,7 +270,8 @@ while True:
     print("3. List bucket contents")
     print("4. Delete file")
     print("5. Test AWS connection")
-    print("6. Exit")
+    print("6. Show operation statistics")  # NEW OPTION
+    print("7. Exit")
 
     choice = input("\nEnter your choice (1-6): ")
 
@@ -274,6 +315,9 @@ while True:
         test_aws_connection()
 
     elif choice == "6":
+        show_operation_stats()  # NEW
+        
+    elif choice == "7":
         print("Goodbye!")
         break
     else:
