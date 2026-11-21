@@ -106,6 +106,17 @@ def format_file_size(size_bytes):
         size_bytes /= 1024
     return f"{size_bytes:.1f} TB"
 
+def log_operation(operation_type, status, details):
+    """Append a timestamped log entry to logs/operations.log."""
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_message = f"[{timestamp}] {operation_type}: {status} - {details}\n"
+    try:
+        os.makedirs("logs", exist_ok=True)
+        with open("logs/operations.log", "a", encoding="utf-8") as f:
+            f.write(log_message)
+    except Exception as e:
+        print(f"Warning: Cannot write to log file: {e}")
+
 def create_s3_bucket(bucket_name):
     """Create a new S3 bucket."""
     client = create_s3_client()
@@ -160,7 +171,7 @@ def list_bucket_contents(bucket_name):
     """Retrieve and display all files in an S3 bucket."""
     client = create_s3_client()
     if client is None:
-        return
+        return False
 
     try:
         response = client.list_objects_v2(Bucket=bucket_name)
@@ -168,7 +179,7 @@ def list_bucket_contents(bucket_name):
 
         if not contents:
             print(f"Bucket '{bucket_name}' is empty.")
-            return
+            return True
 
         print(f"\n--- Contents of '{bucket_name}' ---")
         for obj in contents:
@@ -176,10 +187,13 @@ def list_bucket_contents(bucket_name):
             size = format_file_size(obj["Size"])
             print(f"  {key} - {size}")
         print("-----------------------------------")
+        return True
     except ClientError as e:
         print(f"✗ AWS List Error: {e.response['Error']['Message']}")
+        return False
     except Exception as e:
         print(f"✗ Error listing bucket contents: {e}")
+        return False
 
 def delete_file_from_s3(file_name, bucket_name):
     """Delete a file from an S3 bucket."""
@@ -188,6 +202,9 @@ def delete_file_from_s3(file_name, bucket_name):
         return False
 
     try:
+        # Check if object exists first (raises 404 ClientError if missing)
+        client.head_object(Bucket=bucket_name, Key=file_name)
+        
         client.delete_object(Bucket=bucket_name, Key=file_name)
         print(f"✓ File '{file_name}' deleted from '{bucket_name}'!")
         return True
@@ -212,26 +229,38 @@ while True:
 
     if choice == "1":
         # Create bucket code here
-        bucket_name = input("Enter a unique bucket name: ")
-        create_s3_bucket(bucket_name)
+        bucket_name = input("Enter only a unique bucket name: ")
+        if create_s3_bucket(bucket_name):
+            log_operation("CREATE_BUCKET", "SUCCESS", f"Created bucket with name: {bucket_name}")
+        else:
+            log_operation("CREATE_BUCKET", "FAILED", f"Could not create bucket with name: {bucket_name}")
 
     elif choice == "2":
         # Upload file code here
         file_path = input("Enter the path to the file you want to upload: ")
         bucket_name = input("Enter the bucket name: ")
-        upload_file_to_s3(file_path, bucket_name)
+        if upload_file_to_s3(file_path, bucket_name):
+            log_operation("UPLOAD_FILE", "SUCCESS", f"Uploaded file {os.path.basename(file_path)} to {bucket_name}")
+        else:
+            log_operation("UPLOAD_FILE", "FAILED", f"Upload failed for file {os.path.basename(file_path)} to {bucket_name}")
 
     elif choice == "3":
         # List contents code here
         bucket_name = input("Enter the bucket name: ")
-        list_bucket_contents(bucket_name)
+        if list_bucket_contents(bucket_name):
+            log_operation("LIST_BUCKET", "SUCCESS", f"Contents listed for {bucket_name}")
+        else:
+            log_operation("LIST_BUCKET", "FAILED", f"Failed to list contents for {bucket_name}")
 
     elif choice == "4":
         # Delete file code here
         bucket_name = input("Enter the bucket name: ")
         file_name = input("Enter the file name: ")
-        delete_file_from_s3(file_name, bucket_name)
-        
+        if delete_file_from_s3(file_name, bucket_name):
+            log_operation("DELETE_FILE", "SUCCESS", f"Deleted {file_name} from {bucket_name}")
+        else:
+            log_operation("DELETE_FILE", "FAILED", f"Failed to delete {file_name} from {bucket_name}")
+
     elif choice == "5":
         # Test AWS connection
         test_aws_connection()
