@@ -157,9 +157,29 @@ def upload_file_to_s3(file_path, bucket_name):
         return False
 
 def list_bucket_contents(bucket_name):
-    """List S3 bucket files"""
-    # Implementation here
-    pass
+    """Retrieve and display all files in an S3 bucket."""
+    client = create_s3_client()
+    if client is None:
+        return
+
+    try:
+        response = client.list_objects_v2(Bucket=bucket_name)
+        contents = response.get("Contents", [])
+
+        if not contents:
+            print(f"Bucket '{bucket_name}' is empty.")
+            return
+
+        print(f"\n--- Contents of '{bucket_name}' ---")
+        for obj in contents:
+            key = obj["Key"]
+            size = format_file_size(obj["Size"])
+            print(f"  {key} - {size}")
+        print("-----------------------------------")
+    except ClientError as e:
+        print(f"✗ AWS List Error: {e.response['Error']['Message']}")
+    except Exception as e:
+        print(f"✗ Error listing bucket contents: {e}")
 
 # Main program - Menu interface starts here
 while True:
@@ -186,14 +206,17 @@ while True:
 
     elif choice == "3":
         # List contents code here
-        pass
+        bucket_name = input("Enter the bucket name: ")
+        list_bucket_contents(bucket_name)
     elif choice == "4":
         # Delete file code here
-        pass
+        bucket_name = input("Enter the bucket name: ")
+        file_name = input("Enter the file name: ")
+        delete_file_from_s3(bucket_name, file_name)
     elif choice == "5":
         # Test AWS connection
         test_aws_connection()
-        pass
+
     elif choice == "6":
         print("Goodbye!")
         break
