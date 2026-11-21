@@ -181,6 +181,23 @@ def list_bucket_contents(bucket_name):
     except Exception as e:
         print(f"✗ Error listing bucket contents: {e}")
 
+def delete_file_from_s3(file_name, bucket_name):
+    """Delete a file from an S3 bucket."""
+    client = create_s3_client()
+    if client is None:
+        return False
+
+    try:
+        client.delete_object(Bucket=bucket_name, Key=file_name)
+        print(f"✓ File '{file_name}' deleted from '{bucket_name}'!")
+        return True
+    except ClientError as e:
+        print(f"✗ AWS Delete Error: {e.response['Error']['Message']}")
+        return False
+    except Exception as e:
+        print(f"✗ Error deleting file: {e}")
+        return False
+
 # Main program - Menu interface starts here
 while True:
     print("\n=== S3 File Uploader ===")
@@ -208,11 +225,13 @@ while True:
         # List contents code here
         bucket_name = input("Enter the bucket name: ")
         list_bucket_contents(bucket_name)
+
     elif choice == "4":
         # Delete file code here
         bucket_name = input("Enter the bucket name: ")
         file_name = input("Enter the file name: ")
-        delete_file_from_s3(bucket_name, file_name)
+        delete_file_from_s3(file_name, bucket_name)
+        
     elif choice == "5":
         # Test AWS connection
         test_aws_connection()
