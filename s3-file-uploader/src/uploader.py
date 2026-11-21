@@ -184,6 +184,7 @@ while True:
         bucket_name = input("Enter the bucket name: ")
         upload_file_to_s3(file_path, bucket_name)
 
+
     elif choice == "3":
         # List contents code here
         pass
