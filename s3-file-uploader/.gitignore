@@ -1,0 +1,19 @@
+# AWS credentials (NEVER commit these!)
+config.json
+.aws/
+credentials.txt
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Logs
+logs/*.log
+
+# Environment
+.venv/
+venv/
+
+# Test data
+test-data/
